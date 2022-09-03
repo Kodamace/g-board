@@ -6,7 +6,6 @@ import GaltonBoard from "./features/galton/GaltonBoard";
 function App() {
   return (
     <MainAppContainer>
-      {/* <Counter /> */}
       <GaltonBoard />
     </MainAppContainer>
   );
