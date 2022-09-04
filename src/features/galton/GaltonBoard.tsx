@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Flex, Heading, Spinner } from "@chakra-ui/react";
+import { Button, Flex, Heading, Spinner, useColorMode } from "@chakra-ui/react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   BUCKET_HEIGHT,
@@ -16,6 +16,7 @@ import { TOTAL_BALLS } from "../../global/constants";
 import Histogram from "./components/histogram/Histogram";
 import GaltonBoardSection from "./components/galtonBoardSection/GaltonBoardSection";
 import { useToast } from "@chakra-ui/react";
+import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 let firstRender = true;
 
 interface IGaltonBoard {}
@@ -29,6 +30,7 @@ const GaltonBoard: React.FC<IGaltonBoard> = () => {
   );
   const bucketHeightType = useAppSelector(getBucketHeightType);
   const dispatch = useAppDispatch();
+  const { colorMode, toggleColorMode } = useColorMode();
   const toast = useToast();
 
   const dropBall = () => {
@@ -59,6 +61,9 @@ const GaltonBoard: React.FC<IGaltonBoard> = () => {
     <StyledGaltonBoardWrapper>
       <Flex p={8} w="100%" justifyContent="space-around">
         <Flex justifyContent="space-between" w="33%">
+          <Button onClick={toggleColorMode}>
+            {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+          </Button>
           <Button
             onClick={() => {
               setShowBallsMode(!showBallsMode);
