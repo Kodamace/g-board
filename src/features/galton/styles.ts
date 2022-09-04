@@ -19,6 +19,16 @@ export const StyledBucketsWrapper = styled.div`
   display: flex;
   flex-direction: row;
   border-bottom: 1px solid;
+  overflow: scroll;
+  @media (max-width: 900px) {
+    width: 900px;
+  }
+  @media (max-width: 768px) {
+    width: 500px;
+  }
+  @media (max-width: 500px) {
+    width: 300px;
+  }
 `;
 export const StyledBucketWrapper = styled.div`
   display: flex;

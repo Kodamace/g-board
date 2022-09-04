@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { Heading } from "@chakra-ui/react";
+import { Center, Heading } from "@chakra-ui/react";
 import { TOTAL_BALLS } from "../../../../global/constants";
 import { IGaltonBoardSection } from "../../galtonSlice";
 import { StyledBucketsWrapper } from "../../styles";
@@ -14,7 +14,7 @@ const GaltonBoardSection: React.FC<{
   const { buckets, totalBallsToDrop } = data;
 
   return (
-    <Fragment>
+    <div>
       <p style={{ textAlign: "center" }}>
         Total Balls In Section: {totalBallsToDrop} / {TOTAL_BALLS}
       </p>
@@ -33,7 +33,7 @@ const GaltonBoardSection: React.FC<{
           />
         ))}
       </StyledBucketsWrapper>
-    </Fragment>
+    </div>
   );
 };
 

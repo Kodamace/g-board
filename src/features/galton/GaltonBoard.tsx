@@ -59,8 +59,8 @@ const GaltonBoard: React.FC<IGaltonBoard> = () => {
 
   return (
     <StyledGaltonBoardWrapper>
-      <Flex p={8} w="100%" justifyContent="space-around">
-        <Flex justifyContent="space-between" w="33%">
+      <Flex flexWrap="wrap" p={8} w="100%" justifyContent="space-around">
+        <Flex flexWrap="wrap" justifyContent="space-between" w="33%">
           <Button onClick={toggleColorMode}>
             {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
           </Button>
@@ -97,7 +97,7 @@ const GaltonBoard: React.FC<IGaltonBoard> = () => {
         <Heading textAlign="center" w="33%">
           Galton Board Stack
         </Heading>
-        <Flex w="33%" justifyContent="space-between">
+        <Flex flexWrap="wrap" w="33%" justifyContent="space-between">
           <Button
             onClick={() => {
               if (ballSize === 12)
