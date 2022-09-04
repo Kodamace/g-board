@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Flex, Heading, Spinner } from "@chakra-ui/react";
+import { Button, Flex, Heading, Spinner } from "@chakra-ui/react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   dropBallForFirstHistoGramToBucket,
