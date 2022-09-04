@@ -8,10 +8,16 @@ export interface IGaltonBucket {
 
 export type LoadingStates = "idle" | "loading" | "failed";
 
+export type BucketHeightType = "small" | "normal";
+
 export enum LOADING_STATES {
   idle = "idle",
   loading = "loading",
   failed = "failed",
+}
+export enum BUCKET_HEIGHT {
+  small = "small",
+  normal = "normal",
 }
 
 export interface IGaltonBoardSection {
@@ -23,6 +29,8 @@ export interface GaltonBoardInitialState {
   galtonBoarSections: IGaltonBoardSection[];
   histogramOfFirstGaltonBoard: IGaltonBoardSection;
   status: LoadingStates;
+  maxAmountOfBallsPerBucket: number;
+  bucketHeight: BucketHeightType;
 }
 
 const buckets: IGaltonBucket[] = [
@@ -52,6 +60,8 @@ const initialState: GaltonBoardInitialState = {
     status: LOADING_STATES.idle,
   },
   status: LOADING_STATES.idle,
+  bucketHeight: "normal",
+  maxAmountOfBallsPerBucket: 1000000,
 };
 
 export const getGaltonBoardProbabilityWeights = (buckets: IGaltonBucket[]) => {
@@ -99,11 +109,40 @@ export const getBucketIndexByProbability = (
   return result;
 };
 
+const handleOverFLow = (probabilityIndex: number, amountOfBuckets: number) => {
+  const median = amountOfBuckets / 2;
+  let bucketToOverFlowIntoIndex = -1;
+
+  if (probabilityIndex < median || probabilityIndex < median - 1) {
+    bucketToOverFlowIntoIndex = probabilityIndex - 1;
+  }
+  if (probabilityIndex > median || probabilityIndex === median) {
+    bucketToOverFlowIntoIndex = probabilityIndex + 1;
+  }
+  return bucketToOverFlowIntoIndex;
+};
+
 export const galtonBoardSlice = createSlice({
   name: "galtonBoard",
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
+    updateMaxAmountOfBallsForOverFlow: (state) => {
+      state.maxAmountOfBallsPerBucket =
+        state.bucketHeight === "normal" ? (450 / 5) * 20 : (350 / 5) * 20;
+    },
+    updateBucketType: (state) => {
+      const updatedBucketType =
+        state.bucketHeight === BUCKET_HEIGHT.normal
+          ? BUCKET_HEIGHT.small
+          : BUCKET_HEIGHT.normal;
+      state.maxAmountOfBallsPerBucket =
+        state.bucketHeight === BUCKET_HEIGHT.small
+          ? (450 / 5) * 20
+          : (350 / 5) * 20;
+
+      state.bucketHeight = updatedBucketType;
+    },
     dropBallForFirstHistoGramToBucket: (state) => {
       state.histogramOfFirstGaltonBoard.status = LOADING_STATES.loading;
       const currentGaltonBoardSection = state.galtonBoarSections[0];
@@ -113,15 +152,27 @@ export const galtonBoardSlice = createSlice({
           1
         );
       let weights: number[] = getGaltonBoardProbabilityWeights(buckets);
-      const probabilityIndex = getBucketIndexByProbability(
+      let probabilityIndex = getBucketIndexByProbability(
         state.galtonBoarSections[0].buckets.length,
         weights
       );
-
       if (currentGaltonBoardSection.totalBallsToDrop === 0) return;
 
-      const currentGaltonBoardSectionBucketToUpdate =
+      let currentGaltonBoardSectionBucketToUpdate =
         currentGaltonBoardSection.buckets[probabilityIndex];
+      do {
+        if (
+          currentGaltonBoardSectionBucketToUpdate.balls >=
+          state.maxAmountOfBallsPerBucket
+        ) {
+          probabilityIndex = handleOverFLow(probabilityIndex, buckets.length);
+          currentGaltonBoardSectionBucketToUpdate =
+            currentGaltonBoardSection.buckets[probabilityIndex];
+        }
+      } while (
+        currentGaltonBoardSectionBucketToUpdate.balls >=
+        state.maxAmountOfBallsPerBucket
+      );
       currentGaltonBoardSectionBucketToUpdate.balls += 1;
       currentGaltonBoardSection.totalBallsToDrop -= 1;
       if (
@@ -163,11 +214,25 @@ export const galtonBoardSlice = createSlice({
       let weights: number[] = getGaltonBoardProbabilityWeights(
         newGaltonBoardSection.buckets
       );
-      const probabilityIndex = getBucketIndexByProbability(
+      let probabilityIndex = getBucketIndexByProbability(
         newGaltonBoardSection.buckets.length,
         weights
       );
       if (newGaltonBoardSection.totalBallsToDrop === 0) return;
+      let bucketOfGaltonBoardSection =
+        newGaltonBoardSection.buckets[probabilityIndex];
+
+      do {
+        if (
+          bucketOfGaltonBoardSection.balls >= state.maxAmountOfBallsPerBucket
+        ) {
+          probabilityIndex = handleOverFLow(probabilityIndex, buckets.length);
+          bucketOfGaltonBoardSection =
+            newGaltonBoardSection.buckets[probabilityIndex];
+        }
+      } while (
+        bucketOfGaltonBoardSection.balls >= state.maxAmountOfBallsPerBucket
+      );
       if (
         (newGaltonBoardSection.buckets[probabilityIndex].balls / TOTAL_BALLS) *
           100 ===
@@ -191,6 +256,8 @@ export const {
   addNewGaltonBoardSection,
   dropBallFromBucketToNewGaltonBoardSection,
   saveHistogramOfFirstGaltonBoard,
+  updateMaxAmountOfBallsForOverFlow,
+  updateBucketType,
 } = galtonBoardSlice.actions;
 
 // The function below is called a selector and allows us to select a value from
@@ -201,6 +268,8 @@ export const getGaltonBoardSections = (state: RootState) =>
 
 export const getHistogramOfFirstGaltonBoardSection = (state: RootState) =>
   state.galtonBoard.histogramOfFirstGaltonBoard;
+export const getBucketHeightType = (state: RootState) =>
+  state.galtonBoard.bucketHeight;
 // export const getTotalBallsToDrop = (state: RootState) =>
 //   state.galtonBoard.galtonBoarSections[0].totalBallsToDrop;
 

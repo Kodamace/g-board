@@ -1,7 +1,5 @@
-import { SpinnerIcon } from "@chakra-ui/icons";
 import React from "react";
 import { TOTAL_BALLS } from "../../../../global/constants";
-import { FillProgress } from "../../styles";
 import { StyledBarFill, StyledBarOuter } from "./styles";
 
 const Bar: React.FC<{ balls: number }> = ({ balls }) => {

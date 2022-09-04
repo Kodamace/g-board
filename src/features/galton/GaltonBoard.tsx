@@ -2,10 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Button, Flex, Heading, Spinner } from "@chakra-ui/react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
+  BUCKET_HEIGHT,
   dropBallForFirstHistoGramToBucket,
+  getBucketHeightType,
   getGaltonBoardSections,
   getHistogramOfFirstGaltonBoardSection,
   LOADING_STATES,
+  updateBucketType,
+  updateMaxAmountOfBallsForOverFlow,
 } from "./galtonSlice";
 import { StyledGaltonBoardWrapper } from "./styles";
 import { TOTAL_BALLS } from "../../global/constants";
@@ -23,6 +27,7 @@ const GaltonBoard: React.FC<IGaltonBoard> = () => {
   const histogramOfFirstGaltonBoard = useAppSelector(
     getHistogramOfFirstGaltonBoardSection
   );
+  const bucketHeightType = useAppSelector(getBucketHeightType);
   const dispatch = useAppDispatch();
   const toast = useToast();
 
@@ -43,6 +48,7 @@ const GaltonBoard: React.FC<IGaltonBoard> = () => {
 
   useEffect(() => {
     if (firstRender) {
+      dispatch(updateMaxAmountOfBallsForOverFlow());
       startFirstGaltonBoardSection();
       firstRender = false;
     }
@@ -52,7 +58,7 @@ const GaltonBoard: React.FC<IGaltonBoard> = () => {
   return (
     <StyledGaltonBoardWrapper>
       <Flex p={8} w="100%" justifyContent="space-around">
-        <Flex justifyContent="center" w="33%">
+        <Flex justifyContent="space-between" w="33%">
           <Button
             onClick={() => {
               setShowBallsMode(!showBallsMode);
@@ -65,7 +71,22 @@ const GaltonBoard: React.FC<IGaltonBoard> = () => {
               }
             }}
           >
-            Switch To {showBallsMode ? "Graph" : "Balls"} Mode
+            {showBallsMode ? "Graph" : "Balls"} Mode
+          </Button>
+          <Button
+            onClick={() => {
+              dispatch(updateBucketType());
+              if (bucketHeightType === BUCKET_HEIGHT.normal) {
+                toast({
+                  title: `Buckets will overflow more now as the bucket height has changed and the balls to buckets ratio has decreased!`,
+                  status: "info",
+                  isClosable: true,
+                });
+              }
+            }}
+          >
+            {bucketHeightType === BUCKET_HEIGHT.normal ? "Smaller" : "Normal"}{" "}
+            Buckets
           </Button>
         </Flex>
         <Heading textAlign="center" w="33%">

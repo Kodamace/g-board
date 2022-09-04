@@ -1,16 +1,23 @@
 import { SpinnerIcon } from "@chakra-ui/icons";
 import React from "react";
-import { useAppDispatch } from "../../../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import { TOTAL_BALLS } from "../../../../global/constants";
+import useOverFlowMessage from "../../../../global/hooks/useOverFlowMessage";
 import {
   addNewGaltonBoardSection,
+  BUCKET_HEIGHT,
   dropBallFromBucketToNewGaltonBoardSection,
+  getBucketHeightType,
+  getHistogramOfFirstGaltonBoardSection,
+  LOADING_STATES,
 } from "../../galtonSlice";
 import {
   FillProgress,
+  StyledBallsCounterLabel,
   StyledBucket,
   StyledBucketWrapper,
   StyledInnerBucketContent,
+  StyledOverFlowingMessage,
 } from "../../styles";
 
 interface IBucket {
@@ -21,6 +28,17 @@ interface IBucket {
   ballSize: number;
 }
 
+const StyledBall: React.FC<{ ballSize: number }> = ({ ballSize }) => (
+  <span
+    style={{
+      width: ballSize,
+      height: ballSize,
+      backgroundColor: "purple",
+      borderRadius: 33,
+    }}
+  />
+);
+
 const Bucket: React.FC<IBucket> = ({
   balls,
   indexOfSection,
@@ -28,9 +46,24 @@ const Bucket: React.FC<IBucket> = ({
   showBallsMode,
   ballSize,
 }) => {
+  const bucketHeightType = useAppSelector(getBucketHeightType);
+  const histogramIsLoading =
+    useAppSelector(getHistogramOfFirstGaltonBoardSection).status ===
+    LOADING_STATES.loading;
   const dispatch = useAppDispatch();
-
+  const theBall = 5;
+  const ballsInRow = 100 / theBall;
+  const bucketHeight = bucketHeightType === BUCKET_HEIGHT.normal ? 450 : 350;
+  const amountOfBallsToFillBucket = (bucketHeight / theBall) * ballsInRow;
+  const graphPercentageOfBallsInBucket =
+    (balls / amountOfBallsToFillBucket) * 100;
+  const ballsView = Math.floor(ballSize === 5 ? balls : balls / ballSize);
   const percentage = ((balls / TOTAL_BALLS) * 100).toFixed(2);
+
+  const useOverFlow = useOverFlowMessage(
+    graphPercentageOfBallsInBucket,
+    histogramIsLoading
+  );
 
   const dropBall = async () => {
     await new Promise((res, rej) =>
@@ -51,11 +84,7 @@ const Bucket: React.FC<IBucket> = ({
       );
     }
   }
-  const bucketHeight = showBallsMode ? (TOTAL_BALLS / 100) * 2 : 240;
-  const ballsView = Math.floor(ballSize === 5 ? balls : balls / (ballSize / 2));
-  const bucketHeightPercentage = showBallsMode
-    ? (balls / bucketHeight) * ballSize
-    : (balls / (bucketHeight * 5)) * 100;
+
   return (
     <StyledBucketWrapper>
       <StyledBucket
@@ -73,15 +102,28 @@ const Bucket: React.FC<IBucket> = ({
         }}
       >
         <StyledInnerBucketContent>
-          <div style={{ position: "sticky", top: 0 }}>
+          {useOverFlow.isOverFlowing && (
+            <StyledOverFlowingMessage
+              top="50%"
+              transform="rotate(90deg)"
+              pos="absolute"
+              color="turquoise"
+              w="250px"
+            >
+              {useOverFlow.overFlowMessage}
+            </StyledOverFlowingMessage>
+          )}
+          <StyledBallsCounterLabel
+            graphPercentageOfBallsInBucket={graphPercentageOfBallsInBucket}
+          >
             <SpinnerIcon /> {balls}
-          </div>
+          </StyledBallsCounterLabel>
           {!showBallsMode && (
-            <FillProgress percentage={bucketHeightPercentage} />
+            <FillProgress percentage={graphPercentageOfBallsInBucket} />
           )}
           <div
             style={{
-              width: "150px",
+              width: "100px",
               display: "flex",
               flexWrap: "wrap-reverse",
             }}
@@ -89,17 +131,10 @@ const Bucket: React.FC<IBucket> = ({
             {showBallsMode && (
               <>
                 {Array(ballsView)
-                  .fill(
-                    <span
-                      style={{
-                        width: ballSize,
-                        height: ballSize,
-                        backgroundColor: "purple",
-                        borderRadius: 33,
-                      }}
-                    />
-                  )
-                  .map((ball) => ball)}
+                  .fill((key: number) => (
+                    <StyledBall key={key} ballSize={ballSize} />
+                  ))
+                  .map((ball, i) => ball(i))}
               </>
             )}
           </div>
