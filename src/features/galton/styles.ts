@@ -1,4 +1,12 @@
-import styled from "styled-components";
+import { Heading } from "@chakra-ui/react";
+import styled, { keyframes } from "styled-components";
+
+const flashOverFlow = keyframes`
+  50% {
+    opacity: 0;
+
+}
+`;
 
 export const StyledGaltonBoardWrapper = styled.div`
   height: 100%;
@@ -30,6 +38,7 @@ export const StyledBucket = styled.div<{
   margin: 0px 8px;
   border-radius: 0px 0px 12px 12px;
   overflow: hidden;
+  position: relative;
   :hover {
     cursor: pointer;
     border-color: turquoise;
@@ -38,7 +47,7 @@ export const StyledBucket = styled.div<{
 `;
 
 export const FillProgress = styled.div<{ percentage: number }>`
-  height: ${({ percentage }) => percentage}px;
+  height: ${({ percentage }) => percentage}%;
   width: 100%;
   border-collapse: collapse;
   background-color: purple;
@@ -54,4 +63,25 @@ export const StyledInnerBucketContent = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
+`;
+
+export const StyledBallsCounterLabel = styled.div<{
+  graphPercentageOfBallsInBucket: number;
+}>`
+  position: ${({ graphPercentageOfBallsInBucket }) =>
+    graphPercentageOfBallsInBucket > 90 ? "absolute" : "sticky"};
+  top: 0;
+`;
+
+export const StyledOverFlowingMessage = styled(Heading)`
+  animation-name: ${flashOverFlow};
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+`;
+
+export const StyledBall = styled.div`
+  width: 5px;
+  height: 5px;
+  background-color: purple;
+  border-radius: 33px;
 `;
