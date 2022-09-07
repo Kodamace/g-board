@@ -11,6 +11,8 @@ import {
   getBucketHeightType,
   getHistogramOfFirstGaltonBoardSection,
   LOADING_STATES,
+  toggleBucketBallsDroppingState,
+  IGaltonBucket,
 } from "../../galtonSlice";
 import {
   FillProgress,
@@ -18,14 +20,14 @@ import {
   StyledBallsWrapper,
   StyledBucket,
   StyledBucketBar,
-  StyledBucketTableData,
-  StyledBucketWrapper,
+  StyledCounterWrapper,
   StyledOverFlowingMessage,
+  StyledOverFlowMessageContainer,
   StyledPercentage,
 } from "../../styles";
 
 interface IBucket {
-  balls: number;
+  bucket: IGaltonBucket;
   indexOfSection: number;
   indexOfBucketToDropBalls: number;
   showBallsMode: any;
@@ -45,13 +47,14 @@ const StyledBall: React.FC<{ ballSize: number }> = ({ ballSize }) => (
 );
 
 const Bucket: React.FC<IBucket> = ({
-  balls,
+  bucket,
   indexOfSection,
   indexOfBucketToDropBalls,
   showBallsMode,
   ballSize,
   totalBallsToDrop,
 }) => {
+  const { balls, isDroppingBallsFromBucket } = bucket;
   const bucketHeightType = useAppSelector(getBucketHeightType);
   const histogramIsLoading =
     useAppSelector(getHistogramOfFirstGaltonBoardSection).status ===
@@ -86,6 +89,12 @@ const Bucket: React.FC<IBucket> = ({
         balls,
       })
     );
+    dispatch(
+      toggleBucketBallsDroppingState({
+        indexOfSection,
+        indexOfBucket: indexOfBucketToDropBalls,
+      })
+    );
     for (let i = 0; i < balls; i++) {
       await dropBall();
       dispatch(
@@ -95,6 +104,12 @@ const Bucket: React.FC<IBucket> = ({
         })
       );
     }
+    dispatch(
+      toggleBucketBallsDroppingState({
+        indexOfSection,
+        indexOfBucket: indexOfBucketToDropBalls,
+      })
+    );
   }
   const getOverFlowMsg = () => {
     let v = [];
@@ -105,65 +120,59 @@ const Bucket: React.FC<IBucket> = ({
   };
 
   return (
-    <StyledBucketWrapper>
+    <>
       <StyledBucket
         height={bucketHeight}
         showBallsMode={showBallsMode}
         onClick={async () => {
+          if (isDroppingBallsFromBucket) return;
           if (balls === 0) return;
-          dropAllBallsFromBucket();
+          await dropAllBallsFromBucket();
         }}
       >
-        <StyledBucketTableData>
-          <StyledBucketBar bucketHeight={bucketHeight}>
+        <StyledBucketBar bucketHeight={bucketHeight}>
+          <StyledCounterWrapper>
             <StyledBallsCounterLabel
               graphPercentageOfBallsInBucket={graphPercentageOfBallsInBucket}
             >
               <SpinnerIcon /> {balls}
             </StyledBallsCounterLabel>
-            {!showBallsMode && (
-              <FillProgress percentage={graphPercentageOfBallsInBucket} />
+          </StyledCounterWrapper>
+          {!showBallsMode && (
+            <FillProgress percentage={graphPercentageOfBallsInBucket} />
+          )}
+          {useOverFlow.isOverFlowing && (
+            <StyledOverFlowMessageContainer>
+              {getOverFlowMsg().map((item) => {
+                return (
+                  <Stack>
+                    <StyledOverFlowingMessage
+                      color="turquoise"
+                      transform="rotate(90deg)"
+                      textAlign="right"
+                    >
+                      {item}
+                    </StyledOverFlowingMessage>
+                  </Stack>
+                );
+              })}
+            </StyledOverFlowMessageContainer>
+          )}
+          <StyledBallsWrapper>
+            {showBallsMode && (
+              <>
+                {Array(ballsView)
+                  .fill((key: number) => (
+                    <StyledBall key={key} ballSize={ballSize} />
+                  ))
+                  .map((ball, i) => ball(i))}
+              </>
             )}
-            {useOverFlow.isOverFlowing && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                }}
-              >
-                {getOverFlowMsg().map((item) => {
-                  return (
-                    <Stack>
-                      <StyledOverFlowingMessage
-                        color="turquoise"
-                        transform="rotate(90deg)"
-                        textAlign="right"
-                      >
-                        {item}
-                      </StyledOverFlowingMessage>
-                    </Stack>
-                  );
-                })}
-              </span>
-            )}
-            <StyledBallsWrapper>
-              {showBallsMode && (
-                <>
-                  {Array(ballsView)
-                    .fill((key: number) => (
-                      <StyledBall key={key} ballSize={ballSize} />
-                    ))
-                    .map((ball, i) => ball(i))}
-                </>
-              )}
-            </StyledBallsWrapper>
-          </StyledBucketBar>
-        </StyledBucketTableData>
+          </StyledBallsWrapper>
+        </StyledBucketBar>
+        <StyledPercentage>{percentage} %</StyledPercentage>
       </StyledBucket>
-      <StyledPercentage>{percentage} %</StyledPercentage>
-    </StyledBucketWrapper>
+    </>
   );
 };
 

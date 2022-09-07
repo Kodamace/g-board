@@ -4,6 +4,7 @@ import { TOTAL_BALLS } from "../../global/constants";
 
 export interface IGaltonBucket {
   balls: number;
+  isDroppingBallsFromBucket: boolean;
 }
 
 export type LoadingStates = "idle" | "loading" | "failed";
@@ -34,16 +35,16 @@ export interface GaltonBoardInitialState {
 }
 
 const buckets: IGaltonBucket[] = [
-  { balls: 0 },
-  { balls: 0 },
-  { balls: 0 },
-  { balls: 0 },
-  { balls: 0 },
-  { balls: 0 },
-  { balls: 0 },
-  { balls: 0 },
-  { balls: 0 },
-  { balls: 0 },
+  { balls: 0, isDroppingBallsFromBucket: false },
+  { balls: 0, isDroppingBallsFromBucket: false },
+  { balls: 0, isDroppingBallsFromBucket: false },
+  { balls: 0, isDroppingBallsFromBucket: false },
+  { balls: 0, isDroppingBallsFromBucket: false },
+  { balls: 0, isDroppingBallsFromBucket: false },
+  { balls: 0, isDroppingBallsFromBucket: false },
+  { balls: 0, isDroppingBallsFromBucket: false },
+  { balls: 0, isDroppingBallsFromBucket: false },
+  { balls: 0, isDroppingBallsFromBucket: false },
 ];
 
 const initialState: GaltonBoardInitialState = {
@@ -244,6 +245,15 @@ export const galtonBoardSlice = createSlice({
       newGaltonBoardSection.buckets[probabilityIndex].balls += 1;
       newGaltonBoardSection.totalBallsToDrop -= 1;
     },
+    toggleBucketBallsDroppingState: (state, action) => {
+      const { indexOfSection, indexOfBucket } = action.payload;
+      const isDroppingBallsFromBucketLoadingState =
+        state.galtonBoarSections[indexOfSection].buckets[indexOfBucket]
+          .isDroppingBallsFromBucket;
+      state.galtonBoarSections[indexOfSection].buckets[
+        indexOfBucket
+      ].isDroppingBallsFromBucket = !isDroppingBallsFromBucketLoadingState;
+    },
     saveHistogramOfFirstGaltonBoard: (state) => {
       state.histogramOfFirstGaltonBoard = state.galtonBoarSections[0];
     },
@@ -260,6 +270,7 @@ export const {
   saveHistogramOfFirstGaltonBoard,
   updateMaxAmountOfBallsForOverFlow,
   updateBucketType,
+  toggleBucketBallsDroppingState,
 } = galtonBoardSlice.actions;
 
 // The function below is called a selector and allows us to select a value from

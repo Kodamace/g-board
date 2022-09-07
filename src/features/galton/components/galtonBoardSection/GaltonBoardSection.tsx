@@ -1,15 +1,9 @@
-import React, { Fragment } from "react";
-import { Center, Heading } from "@chakra-ui/react";
+import React from "react";
+import { Heading } from "@chakra-ui/react";
 import { TOTAL_BALLS } from "../../../../global/constants";
 import { IGaltonBoardSection } from "../../galtonSlice";
-import { StyledBucketBar, StyledBucketsWrapper } from "../../styles";
+import { StyledBucketsWrapper, StyledBucketTableBody } from "../../styles";
 import Bucket from "./Bucket";
-import Bar from "../histogram/Bar";
-import {
-  StyledBarContent,
-  StyledBarsOuter,
-  StyledBarWrapper,
-} from "../histogram/styles";
 
 const GaltonBoardSection: React.FC<{
   data: IGaltonBoardSection;
@@ -28,17 +22,21 @@ const GaltonBoardSection: React.FC<{
       Total Balls In Buckets:{" "}
       {buckets.reduce((acc, curr) => (acc += curr.balls), 0)} /{TOTAL_BALLS}
       <StyledBucketsWrapper>
-        {buckets.map(({ balls }, i) => (
-          <Bucket
-            indexOfSection={galtonBoardIndex}
-            indexOfBucketToDropBalls={i}
-            key={i}
-            totalBallsToDrop={totalBallsToDrop}
-            balls={balls}
-            showBallsMode={showBallsMode}
-            ballSize={ballSize}
-          />
-        ))}
+        <StyledBucketTableBody>
+          <tr>
+            {buckets.map((bucket, i) => (
+              <Bucket
+                indexOfSection={galtonBoardIndex}
+                indexOfBucketToDropBalls={i}
+                key={i}
+                totalBallsToDrop={totalBallsToDrop}
+                bucket={bucket}
+                showBallsMode={showBallsMode}
+                ballSize={ballSize}
+              />
+            ))}
+          </tr>
+        </StyledBucketTableBody>
       </StyledBucketsWrapper>
     </div>
   );

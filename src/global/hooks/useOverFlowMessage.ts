@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const useOverFlowMessage = (percentage: number, isLoading: boolean) => {
   const [overFlowMessage, setOverFlowMessage] = useState("Overflowing!");
