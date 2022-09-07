@@ -2,8 +2,14 @@ import React, { Fragment } from "react";
 import { Center, Heading } from "@chakra-ui/react";
 import { TOTAL_BALLS } from "../../../../global/constants";
 import { IGaltonBoardSection } from "../../galtonSlice";
-import { StyledBucketsWrapper } from "../../styles";
+import { StyledBucketBar, StyledBucketsWrapper } from "../../styles";
 import Bucket from "./Bucket";
+import Bar from "../histogram/Bar";
+import {
+  StyledBarContent,
+  StyledBarsOuter,
+  StyledBarWrapper,
+} from "../histogram/styles";
 
 const GaltonBoardSection: React.FC<{
   data: IGaltonBoardSection;
@@ -27,6 +33,7 @@ const GaltonBoardSection: React.FC<{
             indexOfSection={galtonBoardIndex}
             indexOfBucketToDropBalls={i}
             key={i}
+            totalBallsToDrop={totalBallsToDrop}
             balls={balls}
             showBallsMode={showBallsMode}
             ballSize={ballSize}

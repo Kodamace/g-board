@@ -184,21 +184,24 @@ export const galtonBoardSlice = createSlice({
         return;
       }
     },
-    addNewGaltonBoardSection: (state, action) => {
+    updateNewGaltonBoardSection: (state, action) => {
+      const { indexOfSection, balls } = action.payload;
       const newSectionExists =
-        state?.galtonBoarSections?.[action.payload.indexOfSection + 1]?.buckets
-          ?.length;
-      if (newSectionExists) return;
-      const newGaltonBoardSection: IGaltonBoardSection = {
-        buckets,
-        totalBallsToDrop: action.payload.bucketsBalls,
-        status: LOADING_STATES.idle,
-      };
+        state?.galtonBoarSections?.[indexOfSection + 1]?.buckets?.length;
+      if (newSectionExists) {
+        state.galtonBoarSections[indexOfSection + 1].totalBallsToDrop += balls;
+      } else {
+        const newGaltonBoardSection: IGaltonBoardSection = {
+          buckets,
+          totalBallsToDrop: balls,
+          status: LOADING_STATES.idle,
+        };
 
-      state.galtonBoarSections = [
-        ...state.galtonBoarSections,
-        newGaltonBoardSection,
-      ];
+        state.galtonBoarSections = [
+          ...state.galtonBoarSections,
+          newGaltonBoardSection,
+        ];
+      }
     },
     dropBallFromBucketToNewGaltonBoardSection: (state, action) => {
       const { indexOfSection, indexOfBucketToDropBalls } = action.payload;
@@ -209,7 +212,6 @@ export const galtonBoardSlice = createSlice({
       if (bucket.balls === 0) return;
       const newGaltonBoardSection =
         state.galtonBoarSections[indexOfSection + 1];
-      newGaltonBoardSection.totalBallsToDrop = bucket.balls;
       bucket.balls = bucket.balls - 1;
       let weights: number[] = getGaltonBoardProbabilityWeights(
         newGaltonBoardSection.buckets
@@ -253,7 +255,7 @@ export const galtonBoardSlice = createSlice({
 
 export const {
   dropBallForFirstHistoGramToBucket,
-  addNewGaltonBoardSection,
+  updateNewGaltonBoardSection,
   dropBallFromBucketToNewGaltonBoardSection,
   saveHistogramOfFirstGaltonBoard,
   updateMaxAmountOfBallsForOverFlow,

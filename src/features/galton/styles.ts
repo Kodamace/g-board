@@ -1,4 +1,4 @@
-import { Heading } from "@chakra-ui/react";
+import { Box, Heading } from "@chakra-ui/react";
 import styled, { keyframes } from "styled-components";
 
 const flashOverFlow = keyframes`
@@ -15,45 +15,63 @@ export const StyledGaltonBoardWrapper = styled.div`
   align-items: center;
 `;
 
-export const StyledBucketsWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
+export const StyledBucketsWrapper = styled.tr`
   border-bottom: 1px solid;
-  overflow: scroll;
+  display: flex;
+  width: 80vw;
+  padding: 8px;
+  justify-content: center;
   @media (max-width: 900px) {
     width: 900px;
+  }
+  @media (max-width: 850px) {
+    width: 600px;
   }
   @media (max-width: 768px) {
     width: 500px;
   }
-  @media (max-width: 500px) {
+  @media (max-width: 480px) {
+    width: 350px;
+  }
+  @media (max-width: 400px) {
     width: 300px;
   }
+  @media (max-width: 280px) {
+    width: 200px;
+  }
 `;
-export const StyledBucketWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+export const StyledBucketWrapper = styled.table`
+  width: 800px;
 `;
 
-export const StyledBucket = styled.div<{
+export const StyledBucket = styled.tbody<{
   showBallsMode: boolean;
   height: number;
 }>`
   height: ${({ height }) => height}px;
-  width: 100px;
-  border: 1px solid;
-  display: flex;
-  align-items: flex-end;
-  margin: 0px 8px;
-  border-radius: 0px 0px 12px 12px;
-  overflow: hidden;
+  vertical-align: bottom;
+`;
+
+export const StyledBucketTableData = styled.td`
+  height: 100px;
+`;
+export const StyledBucketBar = styled.div`
+  height: 100%;
   position: relative;
-  :hover {
-    cursor: pointer;
-    border-color: turquoise;
-    width: 105px;
-  }
+  border: 1px solid;
+  border-radius: 0px 0px 30px 30px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: hidden;
+`;
+
+export const StyledBallsWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap-reverse;
 `;
 
 export const FillProgress = styled.div<{ percentage: number }>`
@@ -61,18 +79,20 @@ export const FillProgress = styled.div<{ percentage: number }>`
   width: 100%;
   border-collapse: collapse;
   background-color: purple;
-  border-left: 1px solid;
-  border-right: 1px solid;
   text-align: center;
 `;
 
-export const StyledInnerBucketContent = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
+export const StyledPercentage = styled.td`
+  text-align: center;
+  @media (max-width: 900px) {
+    font-size: 15px;
+  }
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+  @media (max-width: 500px) {
+    font-size: 5px;
+  }
 `;
 
 export const StyledBallsCounterLabel = styled.div<{
@@ -81,9 +101,20 @@ export const StyledBallsCounterLabel = styled.div<{
   position: ${({ graphPercentageOfBallsInBucket }) =>
     graphPercentageOfBallsInBucket > 90 ? "absolute" : "sticky"};
   top: 0;
+  text-align: center;
+  @media (max-width: 900px) {
+    font-size: 15px;
+  }
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+  @media (max-width: 500px) {
+    font-size: 5px;
+    width: 20px;
+  }
 `;
 
-export const StyledOverFlowingMessage = styled(Heading)`
+export const StyledOverFlowingMessage = styled(Box)`
   animation-name: ${flashOverFlow};
   animation-duration: 1s;
   animation-iteration-count: infinite;

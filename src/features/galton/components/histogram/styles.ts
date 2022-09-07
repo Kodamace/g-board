@@ -11,6 +11,9 @@ export const StyledBarsOuter = styled.table`
 `;
 export const StyledBarWrapper = styled.div`
   display: flex;
+  width: 80vw;
+  padding: 8px;
+  justify-content: center;
 `;
 export const StyledBarOuter = styled.td`
   height: 100px;

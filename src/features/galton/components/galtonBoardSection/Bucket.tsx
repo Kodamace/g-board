@@ -1,10 +1,11 @@
 import { SpinnerIcon } from "@chakra-ui/icons";
+import { Stack } from "@chakra-ui/react";
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import { TOTAL_BALLS } from "../../../../global/constants";
 import useOverFlowMessage from "../../../../global/hooks/useOverFlowMessage";
 import {
-  addNewGaltonBoardSection,
+  updateNewGaltonBoardSection,
   BUCKET_HEIGHT,
   dropBallFromBucketToNewGaltonBoardSection,
   getBucketHeightType,
@@ -14,10 +15,13 @@ import {
 import {
   FillProgress,
   StyledBallsCounterLabel,
+  StyledBallsWrapper,
   StyledBucket,
+  StyledBucketBar,
+  StyledBucketTableData,
   StyledBucketWrapper,
-  StyledInnerBucketContent,
   StyledOverFlowingMessage,
+  StyledPercentage,
 } from "../../styles";
 
 interface IBucket {
@@ -26,6 +30,7 @@ interface IBucket {
   indexOfBucketToDropBalls: number;
   showBallsMode: any;
   ballSize: number;
+  totalBallsToDrop: number;
 }
 
 const StyledBall: React.FC<{ ballSize: number }> = ({ ballSize }) => (
@@ -45,6 +50,7 @@ const Bucket: React.FC<IBucket> = ({
   indexOfBucketToDropBalls,
   showBallsMode,
   ballSize,
+  totalBallsToDrop,
 }) => {
   const bucketHeightType = useAppSelector(getBucketHeightType);
   const histogramIsLoading =
@@ -62,8 +68,10 @@ const Bucket: React.FC<IBucket> = ({
 
   const useOverFlow = useOverFlowMessage(
     graphPercentageOfBallsInBucket,
-    histogramIsLoading
+    histogramIsLoading || totalBallsToDrop > 0
   );
+
+  console.log(graphPercentageOfBallsInBucket);
 
   const dropBall = async () => {
     await new Promise((res, rej) =>
@@ -74,6 +82,12 @@ const Bucket: React.FC<IBucket> = ({
   };
 
   async function dropAllBallsFromBucket() {
+    dispatch(
+      updateNewGaltonBoardSection({
+        indexOfSection,
+        balls,
+      })
+    );
     for (let i = 0; i < balls; i++) {
       await dropBall();
       dispatch(
@@ -84,6 +98,13 @@ const Bucket: React.FC<IBucket> = ({
       );
     }
   }
+  const getOverFlowMsg = () => {
+    let v = [];
+    for (let i = 0; i < useOverFlow.overFlowMessage.length; i++) {
+      v.push(useOverFlow.overFlowMessage.charAt(i));
+    }
+    return v;
+  };
 
   return (
     <StyledBucketWrapper>
@@ -92,55 +113,58 @@ const Bucket: React.FC<IBucket> = ({
         showBallsMode={showBallsMode}
         onClick={async () => {
           if (balls === 0) return;
-          dispatch(
-            addNewGaltonBoardSection({
-              bucketsBalls: balls,
-              indexOfSection,
-            })
-          );
           dropAllBallsFromBucket();
         }}
       >
-        <StyledInnerBucketContent>
-          {useOverFlow.isOverFlowing && (
-            <StyledOverFlowingMessage
-              top="50%"
-              transform="rotate(90deg)"
-              pos="absolute"
-              color="turquoise"
-              w="250px"
+        <StyledBucketTableData>
+          <StyledBucketBar>
+            <StyledBallsCounterLabel
+              graphPercentageOfBallsInBucket={graphPercentageOfBallsInBucket}
             >
-              {useOverFlow.overFlowMessage}
-            </StyledOverFlowingMessage>
-          )}
-          <StyledBallsCounterLabel
-            graphPercentageOfBallsInBucket={graphPercentageOfBallsInBucket}
-          >
-            <SpinnerIcon /> {balls}
-          </StyledBallsCounterLabel>
-          {!showBallsMode && (
-            <FillProgress percentage={graphPercentageOfBallsInBucket} />
-          )}
-          <div
-            style={{
-              width: "100px",
-              display: "flex",
-              flexWrap: "wrap-reverse",
-            }}
-          >
-            {showBallsMode && (
-              <>
-                {Array(ballsView)
-                  .fill((key: number) => (
-                    <StyledBall key={key} ballSize={ballSize} />
-                  ))
-                  .map((ball, i) => ball(i))}
-              </>
+              <SpinnerIcon /> {balls}
+            </StyledBallsCounterLabel>
+            {!showBallsMode && (
+              <FillProgress percentage={graphPercentageOfBallsInBucket} />
             )}
-          </div>
-        </StyledInnerBucketContent>
+            {useOverFlow.isOverFlowing && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                }}
+              >
+                {getOverFlowMsg().map((item) => {
+                  return (
+                    <Stack>
+                      <StyledOverFlowingMessage
+                        color="turquoise"
+                        transform="rotate(90deg)"
+                        textAlign="right"
+                      >
+                        {item}
+                      </StyledOverFlowingMessage>
+                    </Stack>
+                  );
+                })}
+              </span>
+            )}
+            <StyledBallsWrapper>
+              {showBallsMode && (
+                <>
+                  {Array(ballsView)
+                    .fill((key: number) => (
+                      <StyledBall key={key} ballSize={ballSize} />
+                    ))
+                    .map((ball, i) => ball(i))}
+                </>
+              )}
+            </StyledBallsWrapper>
+          </StyledBucketBar>
+        </StyledBucketTableData>
       </StyledBucket>
-      {percentage} %
+      <StyledPercentage>{percentage} %</StyledPercentage>
     </StyledBucketWrapper>
   );
 };

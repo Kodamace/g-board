@@ -7,6 +7,7 @@ import {
   getBucketHeightType,
   getGaltonBoardSections,
   getHistogramOfFirstGaltonBoardSection,
+  IGaltonBoardSection,
   LOADING_STATES,
   updateBucketType,
   updateMaxAmountOfBallsForOverFlow,
@@ -137,17 +138,19 @@ const GaltonBoard: React.FC<IGaltonBoard> = () => {
       {histogramOfFirstGaltonBoard.status !== LOADING_STATES.loading && (
         <Histogram histogramOfFirstGaltonBoard={histogramOfFirstGaltonBoard} />
       )}
-      {galtonBoardSections.map((galtonBoardSection, galtonBoardIndex) => {
-        return (
-          <GaltonBoardSection
-            key={galtonBoardIndex}
-            data={galtonBoardSection}
-            galtonBoardIndex={galtonBoardIndex}
-            showBallsMode={showBallsMode}
-            ballSize={ballSize}
-          />
-        );
-      })}
+      {galtonBoardSections.map(
+        (galtonBoardSection: IGaltonBoardSection, galtonBoardIndex: number) => {
+          return (
+            <GaltonBoardSection
+              key={galtonBoardIndex}
+              data={galtonBoardSection}
+              galtonBoardIndex={galtonBoardIndex}
+              showBallsMode={showBallsMode}
+              ballSize={ballSize}
+            />
+          );
+        }
+      )}
     </StyledGaltonBoardWrapper>
   );
 };
