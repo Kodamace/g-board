@@ -71,8 +71,6 @@ const Bucket: React.FC<IBucket> = ({
     histogramIsLoading || totalBallsToDrop > 0
   );
 
-  console.log(graphPercentageOfBallsInBucket);
-
   const dropBall = async () => {
     await new Promise((res, rej) =>
       setTimeout(() => {
