@@ -18,6 +18,7 @@ import Histogram from "./components/histogram/Histogram";
 import GaltonBoardSection from "./components/galtonBoardSection/GaltonBoardSection";
 import { useToast } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
+import useNotification from "../../global/hooks/useNotification";
 let firstRender = true;
 
 interface IGaltonBoard {}
@@ -26,6 +27,7 @@ const GaltonBoard: React.FC<IGaltonBoard> = () => {
   const [showBallsMode, setShowBallsMode] = useState(false);
   const [ballSize, setBallSize] = useState(5);
   const galtonBoardSections = useAppSelector(getGaltonBoardSections);
+  const allBallsDropped = galtonBoardSections[0].totalBallsToDrop <= 0;
   const histogramOfFirstGaltonBoard = useAppSelector(
     getHistogramOfFirstGaltonBoardSection
   );
@@ -33,6 +35,7 @@ const GaltonBoard: React.FC<IGaltonBoard> = () => {
   const dispatch = useAppDispatch();
   const { colorMode, toggleColorMode } = useColorMode();
   const toast = useToast();
+  useNotification(allBallsDropped);
 
   const dropBall = () => {
     return new Promise((res, rej) =>
