@@ -115,7 +115,7 @@ const Bucket: React.FC<IBucket> = ({
         }}
       >
         <StyledBucketTableData>
-          <StyledBucketBar>
+          <StyledBucketBar bucketHeight={bucketHeight}>
             <StyledBallsCounterLabel
               graphPercentageOfBallsInBucket={graphPercentageOfBallsInBucket}
             >

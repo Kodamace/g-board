@@ -15,7 +15,7 @@ export const StyledGaltonBoardWrapper = styled.div`
   align-items: center;
 `;
 
-export const StyledBucketsWrapper = styled.tr`
+export const StyledBucketsWrapper = styled.table`
   border-bottom: 1px solid;
   display: flex;
   width: 80vw;
@@ -43,6 +43,9 @@ export const StyledBucketsWrapper = styled.tr`
 export const StyledBucketWrapper = styled.table`
   width: 800px;
 `;
+export const StyledBucketInner = styled.div`
+  width: 800px;
+`;
 
 export const StyledBucket = styled.tbody<{
   showBallsMode: boolean;
@@ -50,14 +53,19 @@ export const StyledBucket = styled.tbody<{
 }>`
   height: ${({ height }) => height}px;
   vertical-align: bottom;
+  :hover {
+    cursor: pointer;
+    border-color: turquoise;
+  }
 `;
 
 export const StyledBucketTableData = styled.td`
   height: 100px;
 `;
-export const StyledBucketBar = styled.div`
-  height: 100%;
+export const StyledBucketBar = styled.div<{ bucketHeight: number }>`
+  height: ${({ bucketHeight }) => bucketHeight}px;
   position: relative;
+  max-width: 100px;
   border: 1px solid;
   border-radius: 0px 0px 30px 30px;
   position: relative;
@@ -66,6 +74,11 @@ export const StyledBucketBar = styled.div`
   align-items: center;
   justify-content: flex-end;
   overflow: hidden;
+  :hover {
+    cursor: pointer;
+    border: 2px solid;
+    border-color: turquoise;
+  }
 `;
 
 export const StyledBallsWrapper = styled.div`
