@@ -2,16 +2,12 @@ import { useToast } from "@chakra-ui/react";
 import { useEffect } from "react";
 
 const useNotification = (showNotification: boolean) => {
-  const toast = useToast();
   useEffect(() => {
     try {
       if (!("Notification" in window)) {
         alert("This browser does not support desktop notification");
       } else if (Notification.permission === "granted") {
         if (showNotification) {
-          navigator.serviceWorker.ready.then(function (registration) {
-            registration.showNotification("Notification with ServiceWorker");
-          });
           new Notification(
             "All balls have been dropped from the first section"
           );
@@ -21,21 +17,11 @@ const useNotification = (showNotification: boolean) => {
         Notification.requestPermission().then((permission) => {
           // If the user accepts, let's create a notification
           if (permission === "granted") {
-            navigator.serviceWorker.ready.then(function (registration) {
-              registration.showNotification("Notification with ServiceWorker");
-            });
-            //   new Notification(
-            //     "Hi there! you will receive notifications like this one."
-            //   );
           }
         });
       }
     } catch (error: any) {
-      toast({
-        title: `Whoops something went wrong with notifications! errorMessage: ${JSON.stringify(
-          error
-        )}`,
-      });
+      console.log(error.message, error);
     }
   }, [showNotification]);
 };
