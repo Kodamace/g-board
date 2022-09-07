@@ -18,9 +18,9 @@ const useNotification = (showNotification: boolean) => {
         Notification.requestPermission().then((permission) => {
           // If the user accepts, let's create a notification
           if (permission === "granted") {
-            new Notification(
-              "Hi there! you will receive notifications like this one."
-            );
+            // new Notification(
+            //   "Hi there! you will receive notifications like this one."
+            // );
             // …
           }
         });
